@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'cluster'
 ]
 
+AUTH_USER_MODEL = 'cluster.tb_staff'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
