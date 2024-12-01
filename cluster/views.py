@@ -1,6 +1,8 @@
 from django.http import HttpResponse, HttpResponseRedirect 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import FileSystemStorage
+from .models import tb_staff
+from .forms import CreateForm
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -57,3 +59,19 @@ def DATA(request):
     # jika ada perintah method get
     else:        
         return render(request, 'kelola-data.html')
+
+def MANAGE_USER(request):
+    if request.method == 'POST':        
+        if 'tambahuser' in request.POST:
+            pass
+           
+    
+    
+    user = tb_staff.objects.raw('SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_staff CROSS JOIN cluster_tb_akses WHERE cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses')
+    context = {'users': user, 'form1':CreateForm()}    
+    return render(request, 'kelola-user.html', context)
+
+def DELETE_USER(request, pk):
+    user = get_object_or_404(tb_staff, pk=pk)
+    user.delete()
+    return redirect('KELOLA USER')

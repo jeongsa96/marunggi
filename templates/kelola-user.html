@@ -1,0 +1,155 @@
+{% extends 'layout.html' %} 
+{% load widget_tweaks %}
+{% load static %} 
+
+{% block content %} 
+<div class="container-fluid d-flex flex-column">
+    <div class="card mt-2">
+      <h5 class="card-header">User</h5>
+      <div class="card-body">
+        <div class="row justify-content-between">
+          <div class="col-sm-3 ms-2">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tambahUserModal">Tambah User</button>
+            <!-- Modal -->
+            <div class="modal fade" id="tambahUserModal" tabindex="-1" aria-labelledby="tambahUserModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="tambahUserModalLabel">Tambah User Baru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="mb-3">
+                      <form action="" method="post">
+                        {% csrf_token %}
+                        {{ form1.id_akses|add_label_class:"form-label" }} 
+                        {% render_field form.id_akses class="form-select" %}                       
+                        <label for="username" class="form-label mt-1">Username</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="username"
+                          id="username"
+                          placeholder="Input username..."
+                          value=""
+                          aria-describedby="usernameFeedback" />
+                        <div id="usernameFeedback" class="invalid-feedback">
+                        </div>
+                        <label for="password1" class="form-label">Password</label>
+                        <input
+                          type="password"
+                          class="form-control"
+                          name="password1"
+                          id="password1"
+                          placeholder="Input password"
+                          aria-describedby="password1Feedback" />
+                        <div id="password1Feedback" class="invalid-feedback">
+                        </div>
+                        <label for="password2" class="form-label">Confirm Password</label>
+                        <input
+                          type="password"
+                          class="form-control"
+                          name="password2"
+                          id="password2"
+                          placeholder="Input password again"
+                          aria-describedby="password2Feedback" />
+                        <div id="password2Feedback" class="invalid-feedback">
+                        </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" id="tambahuser" name ="tambahuser" class="btn btn-primary">Save changes</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mt-2 ms-2">
+            <form action="" method="post" class="d-flex">
+              <input
+                class="form-control me-2"
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
+                id="keyword"
+                name="keyword" />
+              <button class="btn btn-outline-success" type="submit" id="search" name="search">
+                Search
+              </button>
+            </form>
+        </div>
+        <div class="container-fluid mt-3">
+          <table class="table table-primary table-hover">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Username</th>
+                <th scope="col">Akses</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {% for user in users %}
+                  <th scope="row">{{ user.id }}</th>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.nama_akses }}</td>
+                  <td>
+  
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit<?= $id; ?>">Edit</button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="" tabindex="-1" aria-labelledby="edit<?= $id; ?>Label" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="Label">Update User</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="mb-3">
+                              <form action="/admin/update-user/<?= $id; ?>" method="post">
+                                {% csrf_token %}
+                                <label for="akses" class="form-label">Akses Sistem</label>
+                                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" name="akses">
+                                  <option value="0">Open this select menu</option>
+                                  <option value="22">Dokter/Apoteker</option>
+                                  <option value="23">Staff Administrasi</option>
+                                </select>
+                                <label for="username" class="form-label">Username</label>
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  name="username"
+                                  id="username"
+                                  placeholder="Input username..."
+                                  value="">
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" id="update" name="update" class="btn btn-primary">Save changes</button>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <form action="" method="post" class="d-inline">
+                      {% csrf_token %}                      
+                      <a class="btn btn-danger btn-submit" href="{% url 'delete-user' user.pk %}" id="delete" name="delete" onclick="return confirm('Apakah anda yakin?')">Delete</a>
+                    </form>
+                  </td>
+                </tr>            
+                {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </main>
+{% endblock %}

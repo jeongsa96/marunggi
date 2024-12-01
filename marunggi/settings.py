@@ -36,11 +36,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',    
-    'cluster'
+    'django.contrib.staticfiles',  
+    'widget_tweaks',
+    'cluster',
 ]
 
-AUTH_USER_MODEL = 'cluster.tb_staff'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
