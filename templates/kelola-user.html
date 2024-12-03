@@ -85,15 +85,17 @@
           </div>
           <div class="col-md-4 mt-2 ms-2">
             <form action="" method="post" class="d-flex">
+              {% csrf_token %}
               <input
                 class="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
+                type="text"
+                placeholder="Search Username.."
                 id="keyword"
                 name="keyword" />
               <button class="btn btn-outline-success" type="submit" id="search" name="search">
-                Search
+                <svg class="bi" width="16" height="16">
+                  <use xlink:href="#search"></use>
+                </svg>                
               </button>
             </form>
         </div>
@@ -134,7 +136,7 @@
                           </div>
                           <div class="modal-body">
                             <div class="mb-3">
-                              <form action="{% url 'KELOLA USER' user.id %}" method="post">
+                              <form action="{% url 'kelola-user' user.id %}" method="post">
                                 {% csrf_token %}
                                 <label for="id_akses" class="form-label">Akses Sistem</label>
                                 <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" name="id_akses" id="id_akses">
@@ -170,7 +172,7 @@
                     </div>
                     <form action="" method="post" class="d-inline">
                       {% csrf_token %}                      
-                      <a class="btn btn-danger btn-submit" href="{% url 'DELETE USER' user.pk %}" id="delete" name="delete" onclick="return confirm('Apakah anda yakin?')">Delete</a>
+                      <a class="btn btn-danger btn-submit" href="{% url 'delete-user' user.pk %}" id="delete" name="delete" onclick="return confirm('Apakah anda yakin?')">Delete</a>
                     </form>
                   </td>
                 </tr>            

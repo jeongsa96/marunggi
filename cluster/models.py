@@ -8,7 +8,7 @@ class tb_akses(models.Model):
 class tb_data(models.Model):
     id_data = models.IntegerField(primary_key=True)    
     nama_penyakit = models.CharField(max_length=100)
-    tanggal_input = models.DateField()
+    tanggal_input = models.DateField(null=False)
     r1 = models.IntegerField()
     r2 = models.IntegerField()
     r3 = models.IntegerField()

@@ -6,11 +6,11 @@
 <div class="container-fluid d-flex flex-column">
     <div class="card mt-2">
         <div class="card-header">
-            Input File CSV
+            Input Data Penyakit
         </div>
         <div class="card-body">
             {% comment %} form input data penyakit dengan ekstensi .csv {% endcomment %}
-            <h5 class="card-title">Inputkan Data Penyakit</h5>
+            <h5 class="card-title">Inputkan File CSV</h5>
             <form action="" method="post" enctype="multipart/form-data">                
                 {% csrf_token %}  
                     <div class="col-lg-3 my-3">
@@ -21,6 +21,7 @@
                             name="tanggal_input"
                             id="tanggal_input"                            
                             placeholder=""
+                            required
                         />
                     </div>
                 <div class="row g-3">

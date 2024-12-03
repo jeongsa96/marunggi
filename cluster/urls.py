@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path("", views.BASE, name="BASE"),
-    path("kelola-data/", views.DATA, name="KELOLA DATA"),
-    path("kelola-user/<int:id>", views.MANAGE_USER, name="KELOLA USER"),
-    path("delete-user/<int:pk>/", views.DELETE_USER, name="DELETE USER"),
+    path("kelola-user/<int:id>", views.MANAGE_USER, name="kelola-user"),
+    path("delete-user/<int:pk>/", views.DELETE_USER, name="delete-user"),
+    path("kelola-data/", views.DATA, name="kelola-data"),
 ]

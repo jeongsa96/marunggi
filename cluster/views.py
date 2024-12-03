@@ -84,7 +84,14 @@ def MANAGE_USER(request, id=0):
             id_akses = request.POST['id_akses']
             email = request.POST['email']
             tb_staff.objects.filter(pk=id).update(email=email,id_akses_id=id_akses)
-
+        elif 'search' in request.POST:
+            search = request.POST['keyword']
+            search_query = f"%{search}%"      
+            user = tb_staff.objects.raw('''SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_akses CROSS JOIN cluster_tb_staff WHERE cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses AND cluster_tb_staff.username LIKE %s''', [search_query])
+            akses = tb_akses.objects.raw('SELECT * from cluster_tb_akses where id_akses NOT LIKE "23"')
+            context = {'users': user, 'akses': akses}    
+            return render(request, 'kelola-user.html', context)
+    
     akses = tb_akses.objects.raw('SELECT * from cluster_tb_akses where id_akses NOT LIKE "23"')
     user = tb_staff.objects.raw('SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_staff CROSS JOIN cluster_tb_akses WHERE cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses')
     context = {'users': user, 'akses': akses}    
@@ -93,5 +100,5 @@ def MANAGE_USER(request, id=0):
 def DELETE_USER(request, pk):
     user = get_object_or_404(tb_staff, pk=pk)
     user.delete()
-    return redirect('KELOLA USER')
+    return redirect('kelola-user')
 
