@@ -23,8 +23,13 @@
                     <div class="mb-3">
                       <form action="" method="post">
                         {% csrf_token %}
-                        {{ form1.id_akses|add_label_class:"form-label" }} 
-                        {% render_field form.id_akses class="form-select" %}                       
+                        <label for="id_akses" class="form-select-label" >Akses Sistem</label>                      
+                        <select id="id_akses" name="id_akses" class="form-select">
+                          <option selected value="0">Open this select menu</option>
+                        {% for a in akses %}
+                          <option value="{{ a.id_akses }}">{{ a.nama_akses }}</option>
+                        {% endfor %}  
+                        </select>
                         <label for="username" class="form-label mt-1">Username</label>
                         <input
                           type="text"
@@ -32,6 +37,17 @@
                           name="username"
                           id="username"
                           placeholder="Input username..."
+                          value=""
+                          aria-describedby="usernameFeedback" />
+                        <div id="usernameFeedback" class="invalid-feedback">
+                        </div>
+                        <label for="email" class="form-label mt-1">Email</label>
+                        <input
+                          type="email"
+                          class="form-control"
+                          name="email"
+                          id="email"
+                          placeholder="Input email..."
                           value=""
                           aria-describedby="usernameFeedback" />
                         <div id="usernameFeedback" class="invalid-feedback">
@@ -81,6 +97,13 @@
               </button>
             </form>
         </div>
+        {% if test %}
+          {% for message in test %}
+        <div>
+          {{ message }}
+        </div>
+          {% endfor %}
+        {% endif %}
         <div class="container-fluid mt-3">
           <table class="table table-primary table-hover">
             <thead>
@@ -100,9 +123,9 @@
                   <td>
   
                     <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit<?= $id; ?>">Edit</button>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit{{user.id}}">Edit</button>
                     <!-- Modal -->
-                    <div class="modal fade" id="" tabindex="-1" aria-labelledby="edit<?= $id; ?>Label" aria-hidden="true">
+                    <div class="modal fade" id="edit{{user.id}}" tabindex="-1" aria-labelledby="edit{{user.id}}Label" aria-hidden="true">
                       <div class="modal-dialog">
                         <div class="modal-content">
                           <div class="modal-header">
@@ -111,27 +134,35 @@
                           </div>
                           <div class="modal-body">
                             <div class="mb-3">
-                              <form action="/admin/update-user/<?= $id; ?>" method="post">
+                              <form action="{% url 'KELOLA USER' user.id %}" method="post">
                                 {% csrf_token %}
-                                <label for="akses" class="form-label">Akses Sistem</label>
-                                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" name="akses">
+                                <label for="id_akses" class="form-label">Akses Sistem</label>
+                                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" name="id_akses" id="id_akses">
                                   <option value="0">Open this select menu</option>
-                                  <option value="22">Dokter/Apoteker</option>
-                                  <option value="23">Staff Administrasi</option>
+                                  <option {% if user.id_akses_id == 21 %} selected {% endif %} value="21">Dokter/Apoteker</option>
+                                  <option {% if user.id_akses_id == 22 %} selected {% endif %} value="22">Staff Administrasi</option>
                                 </select>
+                                <label for="email" class="form-label">Email</label>
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  name="email"
+                                  id="email"
+                                  placeholder="Input email..."
+                                  value="{{user.email}}">
                                 <label for="username" class="form-label">Username</label>
                                 <input
                                   type="text"
                                   class="form-control"
                                   name="username"
-                                  id="username"
-                                  placeholder="Input username..."
-                                  value="">
+                                  id="username"                                  
+                                  value="{{user.username}}"
+                                  disabled readonly>
                             </div>
                           </div>
                           <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" id="update" name="update" class="btn btn-primary">Save changes</button>
+                            <button type="submit" id="updateuser" name="updateuser" class="btn btn-primary">Save changes</button>
                             </form>
                           </div>
                         </div>
@@ -139,7 +170,7 @@
                     </div>
                     <form action="" method="post" class="d-inline">
                       {% csrf_token %}                      
-                      <a class="btn btn-danger btn-submit" href="{% url 'delete-user' user.pk %}" id="delete" name="delete" onclick="return confirm('Apakah anda yakin?')">Delete</a>
+                      <a class="btn btn-danger btn-submit" href="{% url 'DELETE USER' user.pk %}" id="delete" name="delete" onclick="return confirm('Apakah anda yakin?')">Delete</a>
                     </form>
                   </td>
                 </tr>            

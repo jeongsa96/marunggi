@@ -1,8 +1,10 @@
 from django.http import HttpResponse, HttpResponseRedirect 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import FileSystemStorage
+from django.contrib import messages
+from django.contrib.messages import get_messages
 from .models import tb_staff
-from .forms import CreateForm
+from .models import tb_akses
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -60,18 +62,36 @@ def DATA(request):
     else:        
         return render(request, 'kelola-data.html')
 
-def MANAGE_USER(request):
+def MANAGE_USER(request, id=0):
     if request.method == 'POST':        
         if 'tambahuser' in request.POST:
-            pass
-           
-    
-    
+            akses = request.POST['id_akses']
+            username = request.POST['username']
+            email = request.POST['email']
+            pass1 = request.POST['password1']
+            pass2 = request.POST['password2']
+            # if tb_staff.objects.filter(username=username, email=email).exists():
+            #     messages.error(request, "username atau email sudah terdaftar")
+            #     test = get_messages(request)
+            #     return render(request, 'kelola-user.html', context, test)
+            # elif pass1 != pass2:
+            #     messages.error(request, "konfirmasi password tidak cocok")
+            #     test = get_messages(request)
+            #     return render(request, 'kelola-user.html', context, test)
+
+            tb_staff.objects.create(username=username,password=pass1,email=email,id_akses_id=akses)            
+        elif 'updateuser' in request.POST:
+            id_akses = request.POST['id_akses']
+            email = request.POST['email']
+            tb_staff.objects.filter(pk=id).update(email=email,id_akses_id=id_akses)
+
+    akses = tb_akses.objects.raw('SELECT * from cluster_tb_akses where id_akses NOT LIKE "23"')
     user = tb_staff.objects.raw('SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_staff CROSS JOIN cluster_tb_akses WHERE cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses')
-    context = {'users': user, 'form1':CreateForm()}    
+    context = {'users': user, 'akses': akses}    
     return render(request, 'kelola-user.html', context)
 
 def DELETE_USER(request, pk):
     user = get_object_or_404(tb_staff, pk=pk)
     user.delete()
     return redirect('KELOLA USER')
+
