@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 class tb_akses(models.Model):
     id_akses = models.IntegerField(primary_key=True)

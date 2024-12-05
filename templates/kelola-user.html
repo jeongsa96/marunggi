@@ -99,13 +99,11 @@
               </button>
             </form>
         </div>
-        {% if test %}
-          {% for message in test %}
-        <div>
-          {{ message }}
+        {% for valid in valid_session %}
+        <div class="alert alert-error" role="alert">
+          {{ valid.invalid }}
         </div>
-          {% endfor %}
-        {% endif %}
+        {% endfor %}
         <div class="container-fluid mt-3">
           <table class="table table-primary table-hover">
             <thead>

@@ -63,17 +63,17 @@ def DATA(request):
         return render(request, 'kelola-data.html')
 
 def MANAGE_USER(request, id=0):
-    if request.method == 'POST':        
+    valid_session = None        
+    if request.method == 'POST':
         if 'tambahuser' in request.POST:
             akses = request.POST['id_akses']
             username = request.POST['username']
             email = request.POST['email']
             pass1 = request.POST['password1']
             pass2 = request.POST['password2']
-            # if tb_staff.objects.filter(username=username, email=email).exists():
-            #     messages.error(request, "username atau email sudah terdaftar")
-            #     test = get_messages(request)
-            #     return render(request, 'kelola-user.html', context, test)
+            if tb_staff.objects.filter(username=username, email=email).exists():                
+                    request.session['invalid'] = 'username atau email sudah terdaftar'
+                    valid_session = request.session['invalid']
             # elif pass1 != pass2:
             #     messages.error(request, "konfirmasi password tidak cocok")
             #     test = get_messages(request)
@@ -91,14 +91,19 @@ def MANAGE_USER(request, id=0):
             akses = tb_akses.objects.raw('SELECT * from cluster_tb_akses where id_akses NOT LIKE "23"')
             context = {'users': user, 'akses': akses}    
             return render(request, 'kelola-user.html', context)
+        
+    request.session.modified = True    
     
     akses = tb_akses.objects.raw('SELECT * from cluster_tb_akses where id_akses NOT LIKE "23"')
-    user = tb_staff.objects.raw('SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_staff CROSS JOIN cluster_tb_akses WHERE cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses')
-    context = {'users': user, 'akses': akses}    
+    user = tb_staff.objects.raw('SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_staff CROSS JOIN cluster_tb_akses WHERE cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses AND cluster_tb_staff.id_akses_id NOT LIKE 23')
+    context = {'users': user, 'akses': akses, 'valid_session':valid_session}    
     return render(request, 'kelola-user.html', context)
 
 def DELETE_USER(request, pk):
-    user = get_object_or_404(tb_staff, pk=pk)
+    user = get_object_or_404(tb_staff,pk=pk)
     user.delete()
-    return redirect('kelola-user')
+    return render(request, 'kelola-user.html')
+
+def HASIL_CLUSTER(request):
+    return render(request, 'hasil-cluster.html')
 
