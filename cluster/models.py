@@ -28,6 +28,20 @@ class tb_staff(models.Model):
     password = models.CharField(max_length=100)
     id_akses = models.ForeignKey(tb_akses, on_delete=models.CASCADE, default=None)
 
+class tb_jenis_penyakit(models.Model):
+    id_jenis_penyakit = models.IntegerField(primary_key=True)
+    nama_jenis_penyakit = models.CharField(max_length=255)
+
+class tb_penyakit(models.Model):
+    id_penyakit = models.IntegerField(primary_key=True)
+    id_jenis_penyakit = models.ForeignKey(tb_jenis_penyakit, on_delete=models.CASCADE, default=None)
+    nama_penyakit = models.CharField(max_length=255)
+
+class tb_hasil_cluster(models.Model):
+    nama_penyakit = models.CharField(max_length=255)
+    tanggal = models.DateField(null=False)
+    hasil_klasifikasi = models.CharField(max_length=50)
+
     
     
     

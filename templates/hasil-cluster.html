@@ -5,9 +5,57 @@
 <div class="card mt-2">
     <h5 class="card-header">Visualisasi Clustering Data</h5>
     <div class="card-body">
-      <h5 class="card-title">Special title treatment</h5>
-      <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+      <h5 class="card-title">Visualisasi Per Tanggal.</h5>
+      <form action="" method="post">
+        {% csrf_token %}
+          <div class="row">
+              <div class="mb-3 col-lg-3 d-inline">        
+                <input
+                type="date"
+                class="form-control"
+                name="tanggal"
+                id="tanggal"
+                aria-describedby="helpId"
+                placeholder=""
+                value=""          
+                />
+                <small id="helpId" class="form-text text-muted">Cek Kalender</small>
+              </div>
+              <div class="mb-3 col-lg-2 d-inline">
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  id="visual"
+                  name="visual"
+                >
+                  Cek Visualisasi
+                </button>        
+              </div>
+          </div>
+      </form>
+      <div>
+        {{chart|safe}}
+      </div>
+      <div>
+        <table
+          class="table table-success table-striped"
+        >
+          <thead>
+            <tr>
+              <th scope="col">Banyak Terjangkit</th>
+              <th scope="col">Kurang Terjangkit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="">
+              {% for c in cluster %}
+                  <td>{% if c.hasil_klasifikasi == 'Banyak Terjangkit' %}{{ c.nama_penyakit }}{% endif %}</td>
+                  <td>{% if c.hasil_klasifikasi == 'Kurang Terjangkit' %}{{ c.nama_penyakit }}{% endif %}</td>                                
+              </tr>            
+              {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
