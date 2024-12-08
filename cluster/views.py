@@ -4,6 +4,8 @@ from django.core.files.storage import FileSystemStorage
 from .models import tb_staff
 from .models import tb_akses
 from .models import tb_hasil_cluster
+from .models import tb_penyakit
+from .models import tb_data
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +13,33 @@ import sqlalchemy
 
 # Halaman Utama
 def BASE(request):
-    return render(request, 'home.html')
+    from sklearn.cluster import KMeans
+    engine = sqlalchemy.create_engine('mysql+pymysql://root:@localhost:3306/db_marunggi')
+    # select data dari database
+    query='''SELECT nama_penyakit, SUM(total) AS Total, SUM(r1), SUM(r2), SUM(r3), SUM(r4), SUM(r5), SUM(r6), SUM(r7), SUM(r8), SUM(r9), SUM(r10), SUM(r11), SUM(r12) FROM cluster_tb_data GROUP BY nama_penyakit'''
+    df = pd.read_sql_query(query,engine)
+    X = df.iloc[:, [1,2,3,4,5,6,7,8,9,10,11,12,13]].values
+
+    # Clustering k-means
+    kmeans = KMeans(n_clusters = 2, init = 'k-means++', random_state=1234)
+    y_kmeans = kmeans.fit_predict(X)
+
+    # Visualisasi data
+    import plotly.graph_objects as go
+    clusterCount = np.bincount(y_kmeans)
+    label_cluster = ["Banyak Terjangkit", "Kurang Terjangkit"]    
+    fig = go.Figure(data=([go.Pie(labels=label_cluster, values=clusterCount, pull=[0.2, 0])]))
+    fig.update_layout(legend=dict(
+        xanchor="left",
+        x=0.01
+    ),
+        height=600
+    )
+
+    pie = fig.to_html()
+
+    context = {'pie':pie}
+    return render(request, 'home.html',context)
 # Halaman kelola data
 def DATA(request):
     # jika ada perintah method post
@@ -19,8 +47,8 @@ def DATA(request):
         uploaded_files = request.FILES['file']
         dateInput = request.POST['tanggal_input']
         fs = FileSystemStorage()
-        # simpan file ke dalam local server
         fs.save(uploaded_files.name, uploaded_files)
+        # simpan file ke dalam local server
         file_name = uploaded_files.name 
         # proses data cleaning
         pd.set_option("display.max_rows", None)
@@ -119,9 +147,9 @@ def HASIL_CLUSTER(request):
         df = df.drop(columns = ["Total", "SUM(r1)", "SUM(r2)", "SUM(r3)", "SUM(r4)", "SUM(r5)", "SUM(r6)", "SUM(r7)", "SUM(r8)", "SUM(r9)", "SUM(r10)", "SUM(r11)", "SUM(r12)"])
         df.columns = ['nama_penyakit','tanggal','hasil_klasifikasi']
 
-        df.to_sql(
-            'cluster_tb_hasil_cluster', con=engine, index=False, if_exists='append'
-        )
+        # df.to_sql(
+        #     'cluster_tb_hasil_cluster', con=engine, index=False, if_exists='append'
+        # )
 
         context = {'chart':chart,'kmeans':y_kmeans}
         return render(request, 'hasil-cluster.html', context)
@@ -140,10 +168,45 @@ def HASIL_CLUSTER(request):
     clusterCount = np.bincount(y_kmeans)
     label_cluster = ["Banyak Terjangkit", "Kurang Terjangkit"]    
     fig = go.Figure(data=([go.Pie(labels=label_cluster, title='Clustering Data Penyakit',values=clusterCount, pull=[0.2, 0])]))
+    fig.update_layout(
+        height=600
+    )
 
     chart = fig.to_html()
 
-    cluster = tb_hasil_cluster.objects.all()
-    context = {'chart':chart,'cluster':cluster}
+    banyak = tb_hasil_cluster.objects.filter(hasil_klasifikasi="Banyak Terjangkit")
+    kurang = tb_hasil_cluster.objects.filter(hasil_klasifikasi="Kurang Terjangkit") 
+        
+    context = {'chart':chart,'banyak':banyak,'kurang':kurang}
     return render(request, 'hasil-cluster.html', context)
+
+def HASIL_PREDIKSI(request):
+    engine = sqlalchemy.create_engine('mysql+pymysql://root:@localhost:3306/db_marunggi')
+    if request.method == 'POST':
+        date = request.POST['tanggal']
+        penyakit = request.POST['penyakit']
+        query_penyakit = " '"+ penyakit +"'"
+        query = '''SELECT nama_penyakit, total, tanggal_input FROM cluster_tb_data WHERE tanggal_input <= ' '''+ date +''' ' AND nama_penyakit = 'Penyakit lain ( ISPA NP)'  '''               
+        df = pd.read_sql_query(query,engine)
+        df = df.sort_values(by="tanggal_input")
+        df = df.drop(columns="nama_penyakit")
+        count = len(df)
+        df['hasil_prediksi'] = df['total'].rolling(window=count).mean()
+
+        import plotly.express as px
+        fig = px.line(df,
+              x="tanggal_input",
+              y=["total","hasil_prediksi"],               
+        )
+        fig.update_traces(mode='lines+markers')
+        chart = fig.to_html()
+
+        list_penyakit = tb_penyakit.objects.all()
+        context = {'list':list_penyakit,'chart':chart}
+        return render(request, 'hasil-prediksi.html', context)
+        
+
+    list_penyakit = tb_penyakit.objects.all()
+    context = {'list':list_penyakit}
+    return render(request, 'hasil-prediksi.html',context)
 

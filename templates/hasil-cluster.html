@@ -3,7 +3,7 @@
 {% load static %} 
 <div class="container-fluid d-flex flex-column">
 <div class="card mt-2">
-    <h5 class="card-header">Visualisasi Clustering Data</h5>
+    <h5 class="card-header">Clustering Data Penyakit</h5>
     <div class="card-body">
       <h5 class="card-title">Visualisasi Per Tanggal.</h5>
       <form action="" method="post">
@@ -36,25 +36,44 @@
       <div>
         {{chart|safe}}
       </div>
-      <div>
-        <table
+      <div class="row g-0">
+        <div class="container container-fluid col-lg-6">
+          <table
           class="table table-success table-striped"
-        >
-          <thead>
-            <tr>
-              <th scope="col">Banyak Terjangkit</th>
-              <th scope="col">Kurang Terjangkit</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="">
-              {% for c in cluster %}
-                  <td>{% if c.hasil_klasifikasi == 'Banyak Terjangkit' %}{{ c.nama_penyakit }}{% endif %}</td>
-                  <td>{% if c.hasil_klasifikasi == 'Kurang Terjangkit' %}{{ c.nama_penyakit }}{% endif %}</td>                                
-              </tr>            
+          >
+            <thead>
+              <tr>
+                <th scope="col">Banyak Terjangkit</th>              
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in banyak %}                       
+              <tr class="">
+                    <td>{{ b.nama_penyakit }}</td>                     
               {% endfor %}
-          </tbody>
-        </table>
+              </tr>            
+            </tbody>
+          </table>
+        </div>
+        <div class="container container-fluid col-lg-6">
+          <table
+          class="table table-success table-striped"
+          >
+            <thead>
+              <tr>
+                <th scope="col">Kurang Terjangkit</th>              
+              </tr>
+            </thead>
+            <tbody>
+              {% for k in kurang %}                       
+              <tr class="">
+                    <td>{{ k.nama_penyakit }}</td>                     
+              {% endfor %}
+              </tr>            
+            </tbody>
+          </table>
+        </div>  
+      </div>      
       </div>
     </div>
   </div>

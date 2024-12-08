@@ -26,6 +26,7 @@ urlpatterns = [
     path('delete-user/<int:pk>/', include("cluster.urls")),
     path('kelola-data/', include("cluster.urls")),
     path('hasil-cluster/', include("cluster.urls")),
+    path('hasil-prediksi/', include("cluster.urls")),
     path('', include("django.contrib.auth.urls")),
 
 ]

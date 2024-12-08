@@ -1,0 +1,52 @@
+{% extends 'layout.html' %} 
+{% block content %} 
+{% load static %} 
+<div class="container-fluid d-flex flex-column">
+<div class="card mt-2">
+    <h5 class="card-header">Prediksi Data Penyakit</h5>
+    <div class="card-body">
+      <h5 class="card-title">Visualisasi Per Tanggal.</h5>
+      <form action="" method="post">
+        {% csrf_token %}
+          <div class="mb-3 col-lg-3">        
+            <input
+            type="date"
+            class="form-control"
+            name="tanggal"            
+            aria-describedby="helpId"
+            placeholder=""                   
+            />
+            <small id="helpId" class="form-text text-muted">Cek Kalender</small>
+          </div>
+          <div class="row">
+            <div class="mb-3 col-lg-4 d-inline">
+              <label for="penyakit" class="form-select-label mb-1" >Akses Sistem</label>                      
+              <select name="penyakit" id="penyakit" class="form-select">
+                <option selected value="0">Pilih Penyakit</option>
+                {% for l in list %}
+                <option value="{{ l.nama_penyakit }}">{{ l.nama_penyakit }}</option>
+                {% endfor %}  
+              </select>
+            </div>
+            <div class="mt-4 col-lg-2">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                id="visual"
+                name="visual"
+              >
+                Cek Visualisasi
+              </button>        
+            </div>
+          </div>
+      </form>
+      <div>
+        {{chart|safe}}
+      </div> 
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+{% endblock %}
+ 

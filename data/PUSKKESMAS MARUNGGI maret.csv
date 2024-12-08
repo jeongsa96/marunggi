@@ -1,0 +1,109 @@
+NO;JENIS PENYAKIT;0-7 hr;8-28 hr;1 bl-1 th;1-4 th;5-9 th;10-14 th;15-19 th; 20-44 th;45-54 th;55-59 th;60-69 th;> 70 th;TOTAL
+1;PENYAKIT INFEKSI PADA USUS;;;;;;;;;;;;;
+1303;Penyakit lain ( ISPA NP);;;9;50;37;3;7;25;10;2;6;5;154
+1302;Infeksi Akut lain (ISPA);;;3;10;9;15;8;5;;3;6;;59
+12;PENYAKIT TEKANAN DARAH TINGGI;;;;;;;;5;12;7;19;10;53
+2001;Penyakit kulit infeksi;;;1;7;12;9;3;9;4;;;;45
+21;PENYAKIT PADA SISTEM OTOT & JARINGAN PENGIKAT ( PENY. TULANG BELAKANG, RADANG SENDI TERMASUK RHEUMATIK;;;;;;;1;7;11;5;10;2;36
+2;PENYAKIT TUBERKULOSIS;;;;;;;;;;;;;
+2211;Demam;;;;6;10;8;1;4;4;1;;;34
+1502;Penyakit Pulpa & Jar. Periapikal;;;;1;4;1;3;15;6;1;1;;32
+2204;Gastritis;;;;;;1;4;7;5;6;2;1;26
+3;PENYAKIT BAKTERI;;;;;;;;;;;;;
+2201;DM;;;;;;;;3;10;;10;2;25
+2215;Dispepsia;;;;;;2;3;6;5;4;5;;25
+2002;Penyakit kulit alergi;;;;;;3;;4;;;5;4;16
+102;DIARE  (termasuk tersangka kolera);;;;2;8;;1;1;1;1;1;;15
+2003;Penyakit kulit karena jamur;;;;;;1;;3;2;;5;4;15
+1404;Penyakit lain ( PPOK );;;;;;;;1;;;8;5;14
+2208;Vertigo;;;;;;2;;5;5;1;;;13
+4;PENYAKIT VIRUS;;;;;;;;;;;;;
+801;Gangguan Psikotik;;;;;;;;6;5;;;1;12
+1901;Kecelakaan dan ruda paksa;;;;;;3;1;3;1;;3;1;12
+2203;Cepalgia;;;;;;;2;3;2;3;;;10
+2205;Abses;;;;;;2;4;2;1;1;;;10
+1005;Penyakit mata lain-lain;;;;;;2;2;3;2;;;;9
+1002;Katarak;;;;;;;;;;;3;4;7
+1506;Abses;;;;;1;;;5;1;;;;7
+5;RIKETSIASI & PENYAKIT AKIBAT ARTHTROPODA LAIN;;;;;;;;;;;;;
+201;TB Paru;;;;2;;;;2;;;2;;6
+1101;Infeksi Telinga Tengah;;;;;;;1;3;2;;;;6
+1501;Caries Gigi;;;;;;;;2;1;1;1;;5
+1003;Kelainan Refkasi;;;;;;;;4;;;;;4
+1402;Bronkitis;;;;;;;;3;1;;;;4
+6;PENYAKIT KELAMIN;;;;;;;;;;;;;
+2212;Hipotensi;;;;;;1;;3;;;;;4
+1401;Pneumonia;;;;1;;;1;1;;;;;3
+1504;Gangguan gigi & jar penyangga lain nya;;;;;;3;;;;;;;3
+1001;Glaukoma;;;;;;;;;1;;;;1
+7;PENYAKIT INFEKSI KARENA PARASIT & AKIBAT KEMUDIAN;;;;;;;;;;;;;
+1102;Infeksi Mastoid;;;;;;;;1;;;;;1
+1403;Asma;;;;;;1;;;;;;;1
+1505;Penyakit rg mulut, kel. Ludah, rahang & lainnya;;;;;1;;;;;;;;1
+2213;Haemoroid;;;;;;;;1;;;;;1
+101;Kolera;;;;;;;;;;;;;0
+8;PENYAKIT GANGGUAN MENTAL;;;;;;;;;;;;;
+103;Disentri;;;;;;;;;;;;;0
+104;Infeksi penyakit usus yang lain;;;;;;;;;;;;;0
+202;TB selain paru (ekstra Pulmonec);;;;;;;;;;;;;0
+301;Kusta I/T (MB);;;;;;;;;;;;;0
+302;Kusta B/L (MB);;;;;;;;;;;;;0
+303;Difteri;;;;;;;;;;;;;0
+9;PENYAKIT SUSUNAN SYARAF;;;;;;;;;;;;;
+304;Batuk Rejan;;;;;;;;;;;;;0
+305;Tetanus;;;;;;;;;;;;;0
+306;Pes;;;;;;;;;;;;;0
+10;PENYAKIT MATA & ADNEKSA;;;;;;;;;;;;;
+401;Polio Myelitis Akut;;;;;;;;;;;;;0
+402;Campak;;;;;;;;;;;;;0
+403;Radang Hati Menular;;;;;;;;;;;;;0
+404;Rabies / Lyssa Test;;;;;;;;;;;;;0
+405;DHF (DBD);;;;;;;;;;;;;0
+406;Cacar Air;;;;;;;;;;;;;0
+11;PENYAKIT PADA TELINGA & MASTOID;;;;;;;;;;;;;
+501;Malaria dg pemeriksaan lab;;;;;;;;;;;;;0
+502;Malaria Tropikana ( P. Falcifarum );;;;;;;;;;;;;0
+503;Malaria tanpa pemeriksaan lab ( malaria klinis);;;;;;;;;;;;;0
+504;Antrax;;;;;;;;;;;;;0
+601;Infeksi Gonokokok;;;;;;;;;;;;;0
+602;Non Gonokokok;;;;;;;;;;;;;0
+603;Penyakit kelamin lain nya;;;;;;;;;;;;;0
+701;Frambusia;;;;;;;;;;;;;0
+702;Filariasis;;;;;;;;;;;;;0
+703;Penyakit Kecacingan;;;;;;;;;;;;;0
+14;PENYAKIT SAL. PERNAFASAN BAGIAN BAWAH;;;;;;;;;;;;;
+704;Scables;;;;;;;;;;;;;0
+802;Gangguan Neurotik;;;;;;;;;;;;;0
+803;Retardasi Mental;;;;;;;;;;;;;0
+804;Gangg. Kes bermula pd bayi,anak, remaja & perkembangan;;;;;;;;;;;;;0
+805; Perkembangan jiwa lain nya;;;;;;;;;;;;;0
+15;PENYAKIT RONGGA MULUT;;;;;;;;;;;;;
+901;Epilepsi;;;;;;;;;;;;;0
+902;Penyakit & kelainan susunan syaraf lain nya;;;;;;;;;;;;;0
+1004;Kelainan Kornea;;;;;;;;;;;;;0
+1301;Tonsilitis;;;;;;;;;;;;;0
+1503;Ginggivitis & penyakit periodental;;;;;;;;;;;;;0
+16;PENYAKIT PADA SALURAN KENCING;;;;;;;;;;;;;0
+1701;Keguguran;;;;;;;;;;;;;0
+1702;Pendarahan pd kehamilan, persalinan dan nifas;;;;;;;;;;;;;0
+1703;Keracunan kehamilan ( eklamsia);;;;;;;;;;;;;0
+17;SEBAB KEBIDANAN LANGSUNG;;;;;;;;;;;;;
+1704;Partus Lama;;;;;;;;;;;;;0
+1705;Infeksi pd masa kehamilan, persalinan dan nifas;;;;;;;;;;;;;0
+1706;Hyperemesis;;;;;;;;;;;;;0
+1801;Trauma Lahit;;;;;;;;;;;;;0
+1802;Asfiksia;;;;;;;;;;;;;0
+1803;Tetanus Neonaturum;;;;;;;;;;;;;0
+1902;Keracunan bahan kimia;;;;;;;;;;;;;0
+18;KEADAAN TERTENTU PADA MASA PERINATAL;;;;;;;;;;;;;
+1903;Keracunan bahan makanan;;;;;;;;;;;;;0
+2202;Jantung;;;;;;;;;;;;;0
+2206;Kunjungan Hamil;;;;;;;;;;;;;0
+2207;Anemia;;;;;;;;;;;;;0
+19;KECELAKAAN DAN KERACUNAN;;;;;;;;;;;;;
+2209;Suspek TB;;;;;;;;;;;;;0
+2210;ILI;;;;;;;;;;;;;0
+2216;Tumor;;;;;;;;;;;;;0
+20;PENYAKIT KULIT PENJARINGAN SUB KUTAN;;;;;;;;;;;;;
+13;PENYAKIT SAL. PERNAFASAN BAGIAN ATAS;;;;;;;;;;;;;
+22;PENYAKIT LAIN NYA;;;;;;;;;;;;;
