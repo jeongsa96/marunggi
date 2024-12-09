@@ -6,9 +6,11 @@ from .models import tb_akses
 from .models import tb_hasil_cluster
 from .models import tb_penyakit
 from .models import tb_data
+from random import choice
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
 import sqlalchemy
 
 # Halaman Utama
@@ -16,16 +18,15 @@ def BASE(request):
     from sklearn.cluster import KMeans
     engine = sqlalchemy.create_engine('mysql+pymysql://root:@localhost:3306/db_marunggi')
     # select data dari database
-    query='''SELECT nama_penyakit, SUM(total) AS Total, SUM(r1), SUM(r2), SUM(r3), SUM(r4), SUM(r5), SUM(r6), SUM(r7), SUM(r8), SUM(r9), SUM(r10), SUM(r11), SUM(r12) FROM cluster_tb_data GROUP BY nama_penyakit'''
+    query="""SELECT nama_penyakit, SUM(total) AS Total, SUM(r1), SUM(r2), SUM(r3), SUM(r4), SUM(r5), SUM(r6), SUM(r7), SUM(r8), SUM(r9), SUM(r10), SUM(r11), SUM(r12) FROM cluster_tb_data GROUP BY nama_penyakit"""
     df = pd.read_sql_query(query,engine)
     X = df.iloc[:, [1,2,3,4,5,6,7,8,9,10,11,12,13]].values
 
     # Clustering k-means
-    kmeans = KMeans(n_clusters = 2, init = 'k-means++', random_state=1234)
+    kmeans = KMeans(n_clusters = 2, init = 'k-means++', n_init=5, random_state=0)
     y_kmeans = kmeans.fit_predict(X)
 
     # Visualisasi data
-    import plotly.graph_objects as go
     clusterCount = np.bincount(y_kmeans)
     label_cluster = ["Banyak Terjangkit", "Kurang Terjangkit"]    
     fig = go.Figure(data=([go.Pie(labels=label_cluster, values=clusterCount, pull=[0.2, 0])]))
@@ -38,7 +39,38 @@ def BASE(request):
 
     pie = fig.to_html()
 
-    context = {'pie':pie}
+    data = tb_data.objects.values_list('nama_penyakit', flat=True)
+    random = choice(data)
+    dataframe = pd.read_sql_query("""SELECT nama_penyakit, total, tanggal_input FROM cluster_tb_data WHERE tanggal_input <= CURRENT_DATE() AND nama_penyakit = '"""+random+"""'""",engine)
+    dataframe = dataframe.sort_values(by="tanggal_input")
+    dataframe = dataframe.drop(columns="nama_penyakit")
+    count = len(dataframe)
+    dataframe['hasil_prediksi'] = dataframe['total'].rolling(window=count).mean()
+    dataframe = dataframe.iloc[:, [1, 0, 2]]              
+
+    figure = px.line(dataframe,
+            x="tanggal_input",
+            y=['total','hasil_prediksi'],   
+            height=500,
+            width=1000,                                  
+    )
+    figure.update_traces(mode='lines+markers')
+    figure.update_layout(
+        legend_title_text='',
+        xaxis=dict(
+            title=dict(
+                text='Tanggal'
+            )
+        ),
+        yaxis=dict(
+            title=dict(
+                text='Banyak Kasus'
+            )
+        ),
+    )
+    line = figure.to_html()
+
+    context = {'pie':pie,'line':line,'random':random}
     return render(request, 'home.html',context)
 # Halaman kelola data
 def DATA(request):
@@ -70,8 +102,6 @@ def DATA(request):
             'cluster_tb_data', con=engine, index=False, if_exists='append'
         )
 
-        
-        
         return render(request, 'kelola-data.html')
     # jika ada perintah method get
     else:        
@@ -102,15 +132,15 @@ def MANAGE_USER(request, id=0):
         elif 'search' in request.POST:
             search = request.POST['keyword']
             search_query = f"%{search}%"      
-            user = tb_staff.objects.raw('''SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_akses CROSS JOIN cluster_tb_staff WHERE cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses AND cluster_tb_staff.username LIKE %s''', [search_query])
-            akses = tb_akses.objects.raw('SELECT * from cluster_tb_akses WHERE id_akses NOT LIKE "23"')
+            user = tb_staff.objects.raw("SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_akses CROSS JOIN cluster_tb_staff WHERE cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses AND cluster_tb_staff.username LIKE %s", [search_query])
+            akses = tb_akses.objects.raw("SELECT * from cluster_tb_akses WHERE id_akses NOT LIKE '23'")
             context = {'users': user, 'akses': akses}    
             return render(request, 'kelola-user.html', context)
         
     request.session.modified = True    
     
-    akses = tb_akses.objects.raw('SELECT * from cluster_tb_akses WHERE id_akses NOT LIKE "23"')
-    user = tb_staff.objects.raw('SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_staff CROSS JOIN cluster_tb_akses ON cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses WHERE cluster_tb_staff.id_akses_id NOT LIKE 23')
+    akses = tb_akses.objects.raw("SELECT * from cluster_tb_akses WHERE id_akses NOT LIKE '23'")
+    user = tb_staff.objects.raw("SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_staff CROSS JOIN cluster_tb_akses ON cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses WHERE cluster_tb_staff.id_akses_id NOT LIKE 23")
     context = {'users': user, 'akses': akses, 'valid_session':valid_session}    
     return render(request, 'kelola-user.html', context)
 
@@ -124,49 +154,54 @@ def HASIL_CLUSTER(request):
     engine = sqlalchemy.create_engine('mysql+pymysql://root:@localhost:3306/db_marunggi')
     if request.method == 'POST':
         date = request.POST['tanggal']                
-        query='''SELECT nama_penyakit, SUM(total) AS Total, SUM(r1), SUM(r2), SUM(r3), SUM(r4), SUM(r5), SUM(r6), SUM(r7), SUM(r8), SUM(r9), SUM(r10), SUM(r11), SUM(r12), tanggal_input FROM cluster_tb_data WHERE tanggal_input <= ' '''+ date +''' ' GROUP BY nama_penyakit'''
+        query="""SELECT nama_penyakit, SUM(total) AS Total, SUM(r1), SUM(r2), SUM(r3), SUM(r4), SUM(r5), SUM(r6), SUM(r7), SUM(r8), SUM(r9), SUM(r10), SUM(r11), SUM(r12), tanggal_input FROM cluster_tb_data WHERE tanggal_input <= '"""+ date +"""' GROUP BY nama_penyakit"""
         df = pd.read_sql_query(query,engine)
-        X = df.iloc[:, [1,2,3,4,5,6,7,8,9,10,11,12,13]].values
 
         # Clustering k-means
-        kmeans = KMeans(n_clusters = 2, init = 'k-means++', random_state=1234)
+        X = df.iloc[:, [1,2,3,4,5,6,7,8,9,10,11,12,13]].values
+        kmeans = KMeans(n_clusters = 2, init = 'k-means++', n_init=5, random_state=0)
         y_kmeans = kmeans.fit_predict(X)
         # Visualisasi data
         import plotly.graph_objects as go
         clusterCount = np.bincount(y_kmeans)
-        label_cluster = ["Banyak Terjangkit", "Kurang Terjangkit"]
+        label_cluster = ["Kurang Terjangkit", "Banyak Terjangkit"]
         judul = 'Clustering Data Penyakit Per. '+date    
         fig = go.Figure(data=([go.Pie(labels=label_cluster, title=judul, values=clusterCount, pull=[0.2, 0])]))
-
+        fig.update_layout(
+            height=600
+        )
         chart = fig.to_html()
 
-        mapping = {0:'Banyak Terjangkit', 1:'Kurang Terjangkit'}
+        mapping = {0:'Kurang Terjangkit', 1:'Banyak Terjangkit'}
         y_kmeans = [mapping[i] for i in y_kmeans]
 
         df['cluster'] = y_kmeans
         df = df.drop(columns = ["Total", "SUM(r1)", "SUM(r2)", "SUM(r3)", "SUM(r4)", "SUM(r5)", "SUM(r6)", "SUM(r7)", "SUM(r8)", "SUM(r9)", "SUM(r10)", "SUM(r11)", "SUM(r12)"])
         df.columns = ['nama_penyakit','tanggal','hasil_klasifikasi']
 
-        # df.to_sql(
-        #     'cluster_tb_hasil_cluster', con=engine, index=False, if_exists='append'
-        # )
+        df.to_sql(
+            'cluster_tb_hasil_cluster', con=engine, index=True, index_label='id', if_exists='replace'
+        )
 
-        context = {'chart':chart,'kmeans':y_kmeans}
+        banyak = tb_hasil_cluster.objects.filter(hasil_klasifikasi="Banyak Terjangkit",tanggal__lte=date)
+        kurang = tb_hasil_cluster.objects.filter(hasil_klasifikasi="Kurang Terjangkit",tanggal__lte=date) 
+
+        context = {'banyak':banyak,'kurang':kurang,'chart':chart}
         return render(request, 'hasil-cluster.html', context)
         
     # select data dari database
-    query='''SELECT nama_penyakit, SUM(total) AS Total, SUM(r1), SUM(r2), SUM(r3), SUM(r4), SUM(r5), SUM(r6), SUM(r7), SUM(r8), SUM(r9), SUM(r10), SUM(r11), SUM(r12) FROM cluster_tb_data GROUP BY nama_penyakit'''
+    query="""SELECT nama_penyakit, SUM(total) AS Total, SUM(r1), SUM(r2), SUM(r3), SUM(r4), SUM(r5), SUM(r6), SUM(r7), SUM(r8), SUM(r9), SUM(r10), SUM(r11), SUM(r12) FROM cluster_tb_data GROUP BY nama_penyakit"""
     df = pd.read_sql_query(query,engine)
     X = df.iloc[:, [1,2,3,4,5,6,7,8,9,10,11,12,13]].values
 
     # Clustering k-means
-    kmeans = KMeans(n_clusters = 2, init = 'k-means++', random_state=1234)
+    kmeans = KMeans(n_clusters = 2, init = 'k-means++', n_init=5, random_state=0)
     y_kmeans = kmeans.fit_predict(X)
 
     # Visualisasi data
     import plotly.graph_objects as go
     clusterCount = np.bincount(y_kmeans)
-    label_cluster = ["Banyak Terjangkit", "Kurang Terjangkit"]    
+    label_cluster = ["Kurang Terjangkit", "Banyak Terjangkit"]    
     fig = go.Figure(data=([go.Pie(labels=label_cluster, title='Clustering Data Penyakit',values=clusterCount, pull=[0.2, 0])]))
     fig.update_layout(
         height=600
@@ -177,36 +212,46 @@ def HASIL_CLUSTER(request):
     banyak = tb_hasil_cluster.objects.filter(hasil_klasifikasi="Banyak Terjangkit")
     kurang = tb_hasil_cluster.objects.filter(hasil_klasifikasi="Kurang Terjangkit") 
         
-    context = {'chart':chart,'banyak':banyak,'kurang':kurang}
+    context = {'banyak':banyak,'kurang':kurang,'chart':chart}
     return render(request, 'hasil-cluster.html', context)
 
 def HASIL_PREDIKSI(request):
+    list_penyakit = tb_penyakit.objects.all()
     engine = sqlalchemy.create_engine('mysql+pymysql://root:@localhost:3306/db_marunggi')
-    if request.method == 'POST':
-        date = request.POST['tanggal']
-        penyakit = request.POST['penyakit']
-        query_penyakit = " '"+ penyakit +"'"
-        query = '''SELECT nama_penyakit, total, tanggal_input FROM cluster_tb_data WHERE tanggal_input <= ' '''+ date +''' ' AND nama_penyakit = 'Penyakit lain ( ISPA NP)'  '''               
-        df = pd.read_sql_query(query,engine)
+    if request.method == 'POST':        
+        date = request.POST.get('tanggal')
+        penyakit = request.POST.get('penyakit' )
+        df = pd.read_sql_query("""SELECT nama_penyakit, total, tanggal_input FROM cluster_tb_data WHERE tanggal_input <= '"""+ date +"""' AND nama_penyakit = '"""+penyakit+"""'""",engine)
         df = df.sort_values(by="tanggal_input")
         df = df.drop(columns="nama_penyakit")
         count = len(df)
         df['hasil_prediksi'] = df['total'].rolling(window=count).mean()
+        df = df.iloc[:, [1, 0, 2]]              
 
-        import plotly.express as px
         fig = px.line(df,
               x="tanggal_input",
-              y=["total","hasil_prediksi"],               
+              y=['total','hasil_prediksi'],
+              title='Prediksi '+penyakit,                         
         )
         fig.update_traces(mode='lines+markers')
+        fig.update_layout(
+            legend_title_text='',
+            xaxis=dict(
+                title=dict(
+                    text='Tanggal'
+                )
+            ),
+            yaxis=dict(
+                title=dict(
+                    text='Banyak Kasus'
+                )
+            ),
+        )
         chart = fig.to_html()
-
-        list_penyakit = tb_penyakit.objects.all()
+        
         context = {'list':list_penyakit,'chart':chart}
         return render(request, 'hasil-prediksi.html', context)
         
-
-    list_penyakit = tb_penyakit.objects.all()
     context = {'list':list_penyakit}
     return render(request, 'hasil-prediksi.html',context)
 
