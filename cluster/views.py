@@ -6,6 +6,7 @@ from .models import tb_akses
 from .models import tb_hasil_cluster
 from .models import tb_penyakit
 from .models import tb_data
+from django.contrib import messages
 from random import choice
 import pandas as pd
 import numpy as np
@@ -52,7 +53,8 @@ def BASE(request):
             x="tanggal_input",
             y=['total','hasil_prediksi'],   
             height=500,
-            width=1000,                                  
+            width=1000,  
+            title="Prediksi "+random                                
     )
     figure.update_traces(mode='lines+markers')
     figure.update_layout(
@@ -78,31 +80,41 @@ def DATA(request):
     if request.method == 'POST':
         uploaded_files = request.FILES['file']
         dateInput = request.POST['tanggal_input']
-        fs = FileSystemStorage()
-        fs.save(uploaded_files.name, uploaded_files)
-        # simpan file ke dalam local server
-        file_name = uploaded_files.name 
-        # proses data cleaning
-        pd.set_option("display.max_rows", None)
-        pd.set_option("display.max_columns", None)    
-        df = pd.read_csv(r"D:/Yahya/xampp/htdocs/djangotest/data/" + file_name, delimiter=";")
-        df = df.drop_duplicates()
-        df = df.drop(columns = "NO")
-        df = df.fillna(0)
-        df['tanggal_input'] = dateInput
+        if not dateInput:
+            messages.add_message(request, messages.WARNING, 'Per. Tanggal input tidak boleh kosong')
+            return render(request, 'kelola-data.html')        
+        else:
+            fs = FileSystemStorage()
+            fs.save(uploaded_files.name, uploaded_files)
+            # simpan file ke dalam local server
+            file_name = uploaded_files.name 
+            # proses data cleaning
+            pd.set_option("display.max_rows", None)
+            pd.set_option("display.max_columns", None)    
+            df = pd.read_csv(r"D:/Yahya/xampp/htdocs/djangotest/data/" + file_name, delimiter=";")
+            df['JENIS PENYAKIT'] = df['JENIS PENYAKIT'].str.lower()
+            df['JENIS PENYAKIT'] = df['JENIS PENYAKIT'].str.title()        
+            df = df.fillna(0)
+            data_sebelum = df.to_html(classes="table table-stripped")
+            df = df.drop_duplicates()
+            df = df.drop(columns = "NO")
+            df['tanggal_input'] = dateInput
 
-        for x in df.index:
-            if df.loc[x, "TOTAL"] == 0:
-                df.drop(x, inplace=True)
-        df.rename(columns = {'JENIS PENYAKIT': 'nama_penyakit',"0-7 hr":'r1','8-28 hr':'r2','1 bl-1 th':'r3','1-4 th':'r4','5-9 th':'r5','10-14 th':'r6','15-19 th':'r7',' 20-44 th':'r8','45-54 th':'r9','55-59 th':'r10','60-69 th':'r11','> 70 th':'r12'}, inplace=True)
-        df = df.reset_index(drop=True)
-        # simpan hasil data cleaning ke database
-        engine = sqlalchemy.create_engine('mysql+pymysql://root:@localhost:3306/db_marunggi')
-        df.to_sql(
-            'cluster_tb_data', con=engine, index=False, if_exists='append'
-        )
+            for x in df.index:
+                if df.loc[x, "TOTAL"] == 0:
+                    df.drop(x, inplace=True)
+            df.rename(columns = {'JENIS PENYAKIT': 'nama_penyakit',"0-7 hr":'r1','8-28 hr':'r2','1 bl-1 th':'r3','1-4 th':'r4','5-9 th':'r5','10-14 th':'r6','15-19 th':'r7',' 20-44 th':'r8','45-54 th':'r9','55-59 th':'r10','60-69 th':'r11','> 70 th':'r12'}, inplace=True)
+            df = df.reset_index(drop=True)
+            data_sesudah = df.to_html(classes="table table-stripped")
+            # simpan hasil data cleaning ke database
+            engine = sqlalchemy.create_engine('mysql+pymysql://root:@localhost:3306/db_marunggi')
+            df.to_sql(
+                'cluster_tb_data', con=engine, index=False, if_exists='append'
+            )
+            messages.add_message(request, messages.SUCCESS, 'Data berhasil diinputkan')
 
-        return render(request, 'kelola-data.html')
+            context = {'data1':data_sebelum,'data2':data_sesudah}
+            return render(request, 'kelola-data.html', context)
     # jika ada perintah method get
     else:        
         return render(request, 'kelola-data.html')
@@ -116,19 +128,27 @@ def MANAGE_USER(request, id=0):
             email = request.POST['email']
             pass1 = request.POST['password1']
             pass2 = request.POST['password2']
-            if tb_staff.objects.filter(username=username, email=email).exists():                
-                    request.session['invalid'] = 'username atau email sudah terdaftar'
-                    valid_session = request.session['invalid']
-            # elif pass1 != pass2:
-            #     messages.error(request, "konfirmasi password tidak cocok")
-            #     test = get_messages(request)
-            #     return render(request, 'kelola-user.html', context, test)
+            if akses == "0":                        
+                messages.add_message(request, messages.WARNING,"pilih akses sistem")                
+            elif tb_staff.objects.filter(username=username, email=email).exists():                
+                messages.add_message(request, messages.WARNING,"username atau email telah terdaftar")
+            elif pass1 != pass2:                        
+                messages.add_message(request, messages.WARNING,"konfirmasi password tidak cocok")
+            else:
+                tb_staff.objects.create(email=email,username=username,id_akses_id=akses,password=pass1)
+                messages.add_message(request, messages.SUCCESS,"Input data user berhasil")
 
-            tb_staff.objects.create(username=username,password=pass1,email=email,id_akses_id=akses)            
         elif 'updateuser' in request.POST:
             id_akses = request.POST['id_akses']
             email = request.POST['email']
-            tb_staff.objects.filter(pk=id).update(email=email,id_akses_id=id_akses)
+            user_lama = tb_staff.objects.filter(pk=id)
+            if id_akses == "0":                        
+                messages.add_message(request, messages.WARNING,"pilih akses sistem")
+            for a in user_lama:                
+                if a.email == email:
+                    tb_staff.objects.filter(pk=id).update(email=email,id_akses_id=id_akses)
+                elif tb_staff.objects.filter(email=email).exists():
+                    messages.add_message(request, messages.WARNING,"email telah terdaftar")                            
         elif 'search' in request.POST:
             search = request.POST['keyword']
             search_query = f"%{search}%"      
@@ -153,41 +173,44 @@ def HASIL_CLUSTER(request):
     from sklearn.cluster import KMeans
     engine = sqlalchemy.create_engine('mysql+pymysql://root:@localhost:3306/db_marunggi')
     if request.method == 'POST':
-        date = request.POST['tanggal']                
-        query="""SELECT nama_penyakit, SUM(total) AS Total, SUM(r1), SUM(r2), SUM(r3), SUM(r4), SUM(r5), SUM(r6), SUM(r7), SUM(r8), SUM(r9), SUM(r10), SUM(r11), SUM(r12), tanggal_input FROM cluster_tb_data WHERE tanggal_input <= '"""+ date +"""' GROUP BY nama_penyakit"""
-        df = pd.read_sql_query(query,engine)
+        date = request.POST['tanggal']
+        if not date:
+            messages.add_message(request, messages.WARNING,"Per. Tanggal input tidak boleh kosong")                    
+        else:
+            query="""SELECT nama_penyakit, SUM(total) AS Total, SUM(r1), SUM(r2), SUM(r3), SUM(r4), SUM(r5), SUM(r6), SUM(r7), SUM(r8), SUM(r9), SUM(r10), SUM(r11), SUM(r12), tanggal_input FROM cluster_tb_data WHERE tanggal_input <= '"""+ date +"""' GROUP BY nama_penyakit"""
+            df = pd.read_sql_query(query,engine)
 
-        # Clustering k-means
-        X = df.iloc[:, [1,2,3,4,5,6,7,8,9,10,11,12,13]].values
-        kmeans = KMeans(n_clusters = 2, init = 'k-means++', n_init=5, random_state=0)
-        y_kmeans = kmeans.fit_predict(X)
-        # Visualisasi data
-        import plotly.graph_objects as go
-        clusterCount = np.bincount(y_kmeans)
-        label_cluster = ["Kurang Terjangkit", "Banyak Terjangkit"]
-        judul = 'Clustering Data Penyakit Per. '+date    
-        fig = go.Figure(data=([go.Pie(labels=label_cluster, title=judul, values=clusterCount, pull=[0.2, 0])]))
-        fig.update_layout(
-            height=600
-        )
-        chart = fig.to_html()
+            # Clustering k-means
+            X = df.iloc[:, [1,2,3,4,5,6,7,8,9,10,11,12,13]].values
+            kmeans = KMeans(n_clusters = 2, init = 'k-means++', n_init=5, random_state=0)
+            y_kmeans = kmeans.fit_predict(X)
+            # Visualisasi data
+            import plotly.graph_objects as go
+            clusterCount = np.bincount(y_kmeans)
+            label_cluster = ["Kurang Terjangkit", "Banyak Terjangkit"]
+            judul = 'Clustering Data Penyakit Per. '+date    
+            fig = go.Figure(data=([go.Pie(labels=label_cluster, title=judul, values=clusterCount, pull=[0.2, 0])]))
+            fig.update_layout(
+                height=600
+            )
+            chart = fig.to_html()
 
-        mapping = {0:'Kurang Terjangkit', 1:'Banyak Terjangkit'}
-        y_kmeans = [mapping[i] for i in y_kmeans]
+            mapping = {0:'Kurang Terjangkit', 1:'Banyak Terjangkit'}
+            y_kmeans = [mapping[i] for i in y_kmeans]
 
-        df['cluster'] = y_kmeans
-        df = df.drop(columns = ["Total", "SUM(r1)", "SUM(r2)", "SUM(r3)", "SUM(r4)", "SUM(r5)", "SUM(r6)", "SUM(r7)", "SUM(r8)", "SUM(r9)", "SUM(r10)", "SUM(r11)", "SUM(r12)"])
-        df.columns = ['nama_penyakit','tanggal','hasil_klasifikasi']
+            df['cluster'] = y_kmeans
+            df = df.drop(columns = ["Total", "SUM(r1)", "SUM(r2)", "SUM(r3)", "SUM(r4)", "SUM(r5)", "SUM(r6)", "SUM(r7)", "SUM(r8)", "SUM(r9)", "SUM(r10)", "SUM(r11)", "SUM(r12)"])
+            df.columns = ['nama_penyakit','tanggal','hasil_klasifikasi']
 
-        df.to_sql(
-            'cluster_tb_hasil_cluster', con=engine, index=True, index_label='id', if_exists='replace'
-        )
+            df.to_sql(
+                'cluster_tb_hasil_cluster', con=engine, index=True, index_label='id', if_exists='replace'
+            )
 
-        banyak = tb_hasil_cluster.objects.filter(hasil_klasifikasi="Banyak Terjangkit",tanggal__lte=date)
-        kurang = tb_hasil_cluster.objects.filter(hasil_klasifikasi="Kurang Terjangkit",tanggal__lte=date) 
+            banyak = tb_hasil_cluster.objects.filter(hasil_klasifikasi="Banyak Terjangkit",tanggal__lte=date)
+            kurang = tb_hasil_cluster.objects.filter(hasil_klasifikasi="Kurang Terjangkit",tanggal__lte=date) 
 
-        context = {'banyak':banyak,'kurang':kurang,'chart':chart}
-        return render(request, 'hasil-cluster.html', context)
+            context = {'banyak':banyak,'kurang':kurang,'chart':chart}
+            return render(request, 'hasil-cluster.html', context)
         
     # select data dari database
     query="""SELECT nama_penyakit, SUM(total) AS Total, SUM(r1), SUM(r2), SUM(r3), SUM(r4), SUM(r5), SUM(r6), SUM(r7), SUM(r8), SUM(r9), SUM(r10), SUM(r11), SUM(r12) FROM cluster_tb_data GROUP BY nama_penyakit"""
@@ -220,37 +243,42 @@ def HASIL_PREDIKSI(request):
     engine = sqlalchemy.create_engine('mysql+pymysql://root:@localhost:3306/db_marunggi')
     if request.method == 'POST':        
         date = request.POST.get('tanggal')
-        penyakit = request.POST.get('penyakit' )
-        df = pd.read_sql_query("""SELECT nama_penyakit, total, tanggal_input FROM cluster_tb_data WHERE tanggal_input <= '"""+ date +"""' AND nama_penyakit = '"""+penyakit+"""'""",engine)
-        df = df.sort_values(by="tanggal_input")
-        df = df.drop(columns="nama_penyakit")
-        count = len(df)
-        df['hasil_prediksi'] = df['total'].rolling(window=count).mean()
-        df = df.iloc[:, [1, 0, 2]]              
+        penyakit = request.POST.get('penyakit')
+        if not date:
+            messages.add_message(request, messages.WARNING,"Per. Tanggal input tidak boleh kosong", extra_tags="date")                    
+        elif penyakit == "0":
+            messages.add_message(request, messages.WARNING,"Pilih penyakit yang ingin ada cek", extra_tags="penyakit")                    
+        else:
+            df = pd.read_sql_query("""SELECT nama_penyakit, total, tanggal_input FROM cluster_tb_data WHERE tanggal_input <= '"""+ date +"""' AND nama_penyakit = '"""+penyakit+"""'""",engine)
+            df = df.sort_values(by="tanggal_input")
+            df = df.drop(columns="nama_penyakit")
+            count = len(df)
+            df['hasil_prediksi'] = df['total'].rolling(window=count).mean()
+            df = df.iloc[:, [1, 0, 2]]              
 
-        fig = px.line(df,
-              x="tanggal_input",
-              y=['total','hasil_prediksi'],
-              title='Prediksi '+penyakit,                         
-        )
-        fig.update_traces(mode='lines+markers')
-        fig.update_layout(
-            legend_title_text='',
-            xaxis=dict(
-                title=dict(
-                    text='Tanggal'
-                )
-            ),
-            yaxis=dict(
-                title=dict(
-                    text='Banyak Kasus'
-                )
-            ),
-        )
-        chart = fig.to_html()
-        
-        context = {'list':list_penyakit,'chart':chart}
-        return render(request, 'hasil-prediksi.html', context)
+            fig = px.line(df,
+                x="tanggal_input",
+                y=['total','hasil_prediksi'],
+                title='Prediksi '+penyakit,                         
+            )
+            fig.update_traces(mode='lines+markers')
+            fig.update_layout(
+                legend_title_text='',
+                xaxis=dict(
+                    title=dict(
+                        text='Tanggal'
+                    )
+                ),
+                yaxis=dict(
+                    title=dict(
+                        text='Banyak Kasus'
+                    )
+                ),
+            )
+            chart = fig.to_html()
+            
+            context = {'list':list_penyakit,'chart':chart}
+            return render(request, 'hasil-prediksi.html', context)
         
     context = {'list':list_penyakit}
     return render(request, 'hasil-prediksi.html',context)

@@ -17,26 +17,44 @@
                         <label for="tanggal_input" class="form-label">Per. Tanggal</label>
                         <input
                             type="date"
-                            class="form-control"
+                            class="form-control {% for message in messages %}{% if message.tags == "warning" %}is-invalid{% endif %}{% endfor %}"
                             name="tanggal_input"
                             id="tanggal_input"                            
                             placeholder=""
-                            required
                         />
+                        {% if messages %}
+                            {% for message in messages %}
+                                {% if message.tags == 'warning' %}
+                                <div id="tanggal_inputFeedback" class="invalid-feedback">
+                                    {{message}}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
                     </div>
                 <div class="row g-3">
                     <div class="col-auto">
-                        <input type="file" name="file" id="file" class="form-control" accept=".csv" aria-describedby="fileFeedback" required />
+                        <input type="file" name="file" id="file" class="form-control" accept=".csv" aria-describedby="fileFeedback" required/>
                     </div>
                     <div class="col-auto">
                         <input type="submit" class="btn btn-success mb-3" name="importSubmit" id="importSubmit" value="Import CSV">
                     </div>
                 </div>    
             </form>
-            {% if chart %}           
-                <div class="rendered_html">
-                    {{chart|safe}}
-                </div>                
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == "success" %}
+                        <div class="alert alert-success mt-3" role="alert">
+                            {{message}}
+                        </div>
+                    {% endif %}
+                {% endfor %}  
+            {% endif %}
+            {% if data1 %}
+            <h4 class="card-title">Isi Tabel</h4>
+            {{data1|safe}}
+            <h4 class="card-title">Isi Tabel Setelah Proses Pre-processing</h4>
+            {{data2|safe}}
             {% endif %}
         </div>
     </div>
