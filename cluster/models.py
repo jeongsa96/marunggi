@@ -25,7 +25,7 @@ class tb_data(models.Model):
 class tb_staff(models.Model):    
     email = models.EmailField(max_length=100, unique=True, default=None)
     username = models.CharField(max_length=50,unique=True)
-    password = models.CharField(max_length=100)
+    password = models.CharField(max_length=255)
     id_akses = models.ForeignKey(tb_akses, on_delete=models.CASCADE, default=None)
 
 class tb_jenis_penyakit(models.Model):

@@ -6,7 +6,10 @@ from .models import tb_akses
 from .models import tb_hasil_cluster
 from .models import tb_penyakit
 from .models import tb_data
+from .forms import LoginForm
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.hashers import make_password
 from random import choice
 import pandas as pd
 import numpy as np
@@ -14,8 +17,27 @@ import plotly.express as px
 import plotly.graph_objects as go
 import sqlalchemy
 
+
+def LOGIN(request):
+    form = LoginForm(request.POST or None)
+    msg = None
+    if request.method == 'POST':
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            staff = authenticate(username=username,password=password)
+            if staff is not None:
+                login(request, staff)
+                return redirect("halaman-home")
+            else:
+                msg = 'invalid input'
+        else:
+            msg = 'error validasi'        
+    
+    return render(request, 'registration/login.html', {'form':form, 'msg':msg})
+
 # Halaman Utama
-def BASE(request):
+def HOME(request):
     from sklearn.cluster import KMeans
     engine = sqlalchemy.create_engine('mysql+pymysql://root:@localhost:3306/db_marunggi')
     # select data dari database
@@ -54,11 +76,16 @@ def BASE(request):
             y=['total','hasil_prediksi'],   
             height=500,
             width=1000,  
-            title="Prediksi "+random                                
+            title="<b>Prediksi "+random +"</b>"                               
     )
     figure.update_traces(mode='lines+markers')
     figure.update_layout(
         legend_title_text='',
+        title={        
+        'y':0.9,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'top'},
         xaxis=dict(
             title=dict(
                 text='Tanggal'
@@ -90,11 +117,12 @@ def DATA(request):
             file_name = uploaded_files.name 
             # proses data cleaning
             pd.set_option("display.max_rows", None)
-            pd.set_option("display.max_columns", None)    
+            pd.set_option("display.max_columns", None)
             df = pd.read_csv(r"D:/Yahya/xampp/htdocs/djangotest/data/" + file_name, delimiter=";")
             df['JENIS PENYAKIT'] = df['JENIS PENYAKIT'].str.lower()
-            df['JENIS PENYAKIT'] = df['JENIS PENYAKIT'].str.title()        
+            df['JENIS PENYAKIT'] = df['JENIS PENYAKIT'].str.title()
             df = df.fillna(0)
+            df = df.convert_dtypes()
             data_sebelum = df.to_html(classes="table table-stripped")
             df = df.drop_duplicates()
             df = df.drop(columns = "NO")
@@ -120,7 +148,6 @@ def DATA(request):
         return render(request, 'kelola-data.html')
 
 def MANAGE_USER(request, id=0):
-    valid_session = None        
     if request.method == 'POST':
         if 'tambahuser' in request.POST:
             akses = request.POST['id_akses']
@@ -133,9 +160,10 @@ def MANAGE_USER(request, id=0):
             elif tb_staff.objects.filter(username=username, email=email).exists():                
                 messages.add_message(request, messages.WARNING,"username atau email telah terdaftar")
             elif pass1 != pass2:                        
-                messages.add_message(request, messages.WARNING,"konfirmasi password tidak cocok")
+                messages.add_message(request, messages.WARNING,"konfirmasi password tidak cocok")                
             else:
-                tb_staff.objects.create(email=email,username=username,id_akses_id=akses,password=pass1)
+                passinput = make_password(pass1,salt=None)
+                tb_staff.objects.create(email=email,username=username,id_akses_id=akses,password=passinput)
                 messages.add_message(request, messages.SUCCESS,"Input data user berhasil")
 
         elif 'updateuser' in request.POST:
@@ -156,12 +184,10 @@ def MANAGE_USER(request, id=0):
             akses = tb_akses.objects.raw("SELECT * from cluster_tb_akses WHERE id_akses NOT LIKE '23'")
             context = {'users': user, 'akses': akses}    
             return render(request, 'kelola-user.html', context)
-        
-    request.session.modified = True    
     
-    akses = tb_akses.objects.raw("SELECT * from cluster_tb_akses WHERE id_akses NOT LIKE '23'")
+    akses = tb_akses.objects.raw("SELECT * from cluster_tb_akses")
     user = tb_staff.objects.raw("SELECT cluster_tb_staff.id, cluster_tb_staff.username, cluster_tb_akses.nama_akses FROM cluster_tb_staff CROSS JOIN cluster_tb_akses ON cluster_tb_staff.id_akses_id = cluster_tb_akses.id_akses WHERE cluster_tb_staff.id_akses_id NOT LIKE 23")
-    context = {'users': user, 'akses': akses, 'valid_session':valid_session}    
+    context = {'users': user, 'akses': akses}    
     return render(request, 'kelola-user.html', context)
 
 def DELETE_USER(request, pk):
@@ -259,11 +285,12 @@ def HASIL_PREDIKSI(request):
             fig = px.line(df,
                 x="tanggal_input",
                 y=['total','hasil_prediksi'],
-                title='Prediksi '+penyakit,                         
+                title='<b>Prediksi '+penyakit+"</b>",                         
             )
             fig.update_traces(mode='lines+markers')
             fig.update_layout(
                 legend_title_text='',
+                title=dict(font=dict(size=12)),
                 xaxis=dict(
                     title=dict(
                         text='Tanggal'
