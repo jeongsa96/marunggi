@@ -80,7 +80,16 @@
           <label for="floatingPassword">Password</label>
         </div>
         {% if msg %}
-        <div>{{msg}}</div>
+        <div class="alert alert-danger mt-3" role="alert">
+          {{msg}}
+        </div>
+        {% endif %} 
+        {% if messages %} 
+          {% for message in messages %} 
+            <div class="alert alert-success mt-3" role="alert">
+              {{message}}
+            </div>
+          {% endfor %} 
         {% endif %}
         <button class="w-100 btn btn-lg btn-primary mt-2" type="submit">
           Sign in

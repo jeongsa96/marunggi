@@ -42,6 +42,10 @@ class tb_hasil_cluster(models.Model):
     tanggal = models.DateField(null=False)
     hasil_klasifikasi = models.CharField(max_length=50)
 
+class tb_hasil_prediksi(models.Model):
+    nama_penyakit = models.CharField(max_length=255)
+    tanggal = models.DateField(null=False)
+    hasil_prediksi = models.CharField(max_length=50)
     
     
     

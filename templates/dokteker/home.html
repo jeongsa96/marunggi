@@ -1,0 +1,26 @@
+{% extends 'dokteker/layout.html' %}    
+
+{% block content %}
+{% load static %}
+        <div class="container-fluid d-flex flex-column">
+          <div
+            id="carouselExampleControls"
+            class="carousel carousel-dark slide"
+            data-bs-ride="carousel"
+          >
+            <div class="carousel-inner">
+              <div class="carousel-item active" data-bs-interval="3500">
+                {{pie|safe}}
+                <div class="carousel-caption d-none d-md-block">
+                  <h5>Clustering Data Penyakit</h5>                  
+                </div>
+              </div>
+              <div class="carousel-item" data-bs-interval="3500">
+                {{line|safe}}
+              </div>              
+            </div>            
+          </div>
+        </div>
+      </div>
+    </main>
+{% endblock %}    

@@ -21,14 +21,15 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login/', include("cluster.urls")),
     path('', include("cluster.urls")),
     path('kelola-user/', include("cluster.urls")),
     path('delete-user/<int:pk>/', include("cluster.urls")),
     path('kelola-data/', include("cluster.urls")),
     path('hasil-cluster/', include("cluster.urls")),
     path('hasil-prediksi/', include("cluster.urls")),
-    path('login/', include("cluster.urls")),
-
+    path('dokterer/', include("cluster.urls")),
+    path('administrasi/', include("cluster.urls")),
 ]
 
 if settings.DEBUG:
