@@ -22,20 +22,25 @@
     <div class="container-fluid d-flex flex-column">
       <div
         id="carouselExampleControls"
-        class="carousel carousel-dark slide"
+        class="carousel carousel-fade slide"
         data-bs-ride="carousel"
       >
         <div class="carousel-inner">
           <div class="carousel-item active" data-bs-interval="7200">
             <img
-              src="{% static 'assets/images/marunggi-login2.jpg' %}"
+              src="{% static 'assets/images/login-marunggi.jpeg' %}"
               class="d-block w-100 h-600"
               alt="..."
             />
+            <div class="carousel-caption d-none d-md-block">
+              <h5 style="color:white; font-family:Cursive">Sejarah Puskesmas Marunggi</h5>
+              <p style="color:white; font-family:Cursive">Puskesmas Marunggi di resmikan di Desa Marunggi Kecamatan Pariaman Selatan Kota Pariaman oleh Bapak Walikota saat itu Bapak H. Mahyudin pada hari Rabu tanggal 28 Mei 2008. Puskesmas Marunggi merupakan salah satu dari 7 Puskesmas yang ada di Kota Pariaman. Terdiri dari 7 Desa (Desa Marunggi, Desa Padang Cakur, Desa Kampung Apar, Desa Sikabu, Desa Pasir Sunur, Desa Palak Aneh dan Desa Taluk) dengan 24 Dusun.</p>
+            </div>
           </div>
           <div class="carousel-item" data-bs-interval="7200">
             <img
-              src="{% static 'assets/images/marunggi-login3.jpg' %}"
+              src="{% static 'assets/images/login2.jpg' %}"
+              height="800"
               class="d-block w-100 h-600"
               alt="..."
             />
@@ -55,28 +60,11 @@
           height="67"
         />
         <div class="form-floating">
-          {% comment %}
-          <input
-            type="text"
-            class="form-control"
-            id="username"
-            name="username"
-            placeholder="name@example.com"
-            value=""
-          />
-          {% endcomment %} {{form.username}}
+          {{form.username}}
           <label for="floatingInput">Username</label>
         </div>
         <div class="form-floating">
-          {% comment %}
-          <input
-            type="password"
-            class="form-control"
-            id="password"
-            name="password"
-            placeholder="Password"
-          />
-          {% endcomment %} {{form.password}}
+          {{form.password}}
           <label for="floatingPassword">Password</label>
         </div>
         {% if msg %}
@@ -86,9 +74,21 @@
         {% endif %} 
         {% if messages %} 
           {% for message in messages %} 
-            <div class="alert alert-success mt-3" role="alert">
-              {{message}}
-            </div>
+              {% if message.tags == 'success' %}
+              <div class="alert alert-success mt-3" role="alert">
+                {{message}}
+              </div>
+              {% endif %}
+              {% if message.tags == 'error' %}
+              <div class="alert alert-danger mt-3" role="alert">
+                {{message}}
+              </div>
+              {% endif %}
+              {% if message.tags == 'warning' %}
+              <div class="alert alert-warning mt-3" role="alert">
+                {{message}}
+              </div>
+              {% endif %}
           {% endfor %} 
         {% endif %}
         <button class="w-100 btn btn-lg btn-primary mt-2" type="submit">

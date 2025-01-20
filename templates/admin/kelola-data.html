@@ -4,60 +4,104 @@
 {% load static %}
 
 <div class="container-fluid d-flex flex-column">
-    <div class="card mt-2">
-        <div class="card-header">
-            Input Data Penyakit
-        </div>
-        <div class="card-body">
-            {% comment %} form input data penyakit dengan ekstensi .csv {% endcomment %}
-            <h5 class="card-title">Inputkan File CSV</h5>
-            <form action="" method="post" enctype="multipart/form-data">                
-                {% csrf_token %}  
-                    <div class="col-lg-3 my-3">
-                        <label for="tanggal_input" class="form-label">Per. Tanggal</label>
-                        <input
-                            type="date"
-                            class="form-control {% for message in messages %}{% if message.tags == "warning" %}is-invalid{% endif %}{% endfor %}"
-                            name="tanggal_input"
-                            id="tanggal_input"                            
-                            placeholder=""
-                        />
-                        {% if messages %}
-                            {% for message in messages %}
-                                {% if message.tags == 'warning' %}
-                                <div id="tanggal_inputFeedback" class="invalid-feedback">
-                                    {{message}}
-                                </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card mt-2">
+                <div class="card-header">
+                    Input Data Penyakit
+                </div>
+                <div class="card-body">
+                    {% comment %} form input data penyakit dengan ekstensi .csv {% endcomment %}
+                    <h5 class="card-title">Input File CSV</h5>
+                    <form action="" method="post" enctype="multipart/form-data">                
+                        {% csrf_token %}  
+                            <div class="col-lg-4 my-3">
+                                <label for="tanggal_input" class="form-label">Per. Tanggal</label>
+                                <input
+                                    type="date"
+                                    class="form-control {% for message in messages %}{% if message.tags == "warning" %}is-invalid{% endif %}{% endfor %}"
+                                    name="tanggal_input"
+                                    id="tanggal_input"                            
+                                    placeholder=""
+                                />
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if message.tags == 'warning' %}
+                                        <div id="tanggal_inputFeedback" class="invalid-feedback">
+                                            {{message}}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                <div class="row g-3">
-                    <div class="col-auto">
-                        <input type="file" name="file" id="file" class="form-control" accept=".csv" aria-describedby="fileFeedback" required/>
-                    </div>
-                    <div class="col-auto">
-                        <input type="submit" class="btn btn-success mb-3" name="importSubmit" id="importSubmit" value="Import CSV">
-                    </div>
-                </div>    
-            </form>
-            {% if messages %}
-                {% for message in messages %}
-                    {% if message.tags == "success" %}
-                        <div class="alert alert-success mt-3" role="alert">
-                            {{message}}
-                        </div>
-                    {% endif %}
-                {% endfor %}  
-            {% endif %}
-            {% if data1 %}
-            <h4 class="card-title">Isi Tabel</h4>
-            {{data1|safe}}
-            <h4 class="card-title">Isi Tabel Setelah Proses Pre-processing</h4>
-            {{data2|safe}}
-            {% endif %}
+                            </div>
+                        <div class="row g-3">
+                            <div class="col-auto">
+                                <input type="file" name="file" id="file" class="form-control" accept=".csv" aria-describedby="fileFeedback" required/>
+                            </div>
+                            <div class="col-auto">
+                                <input type="submit" class="btn btn-success mb-3" name="importSubmit" id="importSubmit" value="Import CSV">
+                            </div>
+                        </div>    
+                    </form>
+                </div>
+            </div>
         </div>
+        <div class="col-lg-6">
+            <div class="card mt-2">
+                <div class="card-header">
+                    Cek Data Penyakit
+                </div>
+                <div class="card-body">
+                    {% comment %} form input data penyakit dengan ekstensi .csv {% endcomment %}
+                    <h5 class="card-title">Cek Data</h5>
+                    <form action="" method="post" enctype="multipart/form-data">                
+                        {% csrf_token %}                  
+                            <div class="col-lg-3 my-3">
+                                <label for="bulan_input" class="form-label">Data Bulan.</label>
+                                <input
+                                    type="month"
+                                    class="form-control {% for message in messages %}{% if message.tags == "warning" %}is-invalid{% endif %}{% endfor %}"
+                                    name="bulan_input"
+                                    id="bulan_input"                            
+                                    placeholder=""
+                                />
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if message.tags == 'warning' %}
+                                        <div id="bulan_inputFeedback" class="invalid-feedback">
+                                            {{message}}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-4">
+                                <input type="submit" class="btn btn-success mb-3" name="cekSubmit" id="cekSubmit" value="Cek Data">
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>    
     </div>
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == "success" %}
+                <div class="alert alert-success mt-3" role="alert">
+                    {{message}}
+                </div>
+            {% endif %}
+        {% endfor %}  
+    {% endif %} 
+    {% if data1 %}
+        <h4 class="card-title">Isi Tabel</h4>
+        {{data1|safe}}
+        <h4 class="card-title">Isi Tabel Setelah Proses Pre-processing</h4>
+        {{data2|safe}}
+    {% endif %}
+    {% if cek %}
+        <h4 class="card-title">Isi Tabel</h4>
+        {{cek|safe}}                
+    {% endif %}    
 </div>
 </div>
 </main>

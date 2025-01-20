@@ -128,54 +128,48 @@
           d="M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999zm2.493 8.574a.5.5 0 0 1-.411.575c-.712.118-1.28.295-1.655.493a1.319 1.319 0 0 0-.37.265.301.301 0 0 0-.057.09V14l.002.008a.147.147 0 0 0 .016.033.617.617 0 0 0 .145.15c.165.13.435.27.813.395.751.25 1.82.414 3.024.414s2.273-.163 3.024-.414c.378-.126.648-.265.813-.395a.619.619 0 0 0 .146-.15.148.148 0 0 0 .015-.033L12 14v-.004a.301.301 0 0 0-.057-.09 1.318 1.318 0 0 0-.37-.264c-.376-.198-.943-.375-1.655-.493a.5.5 0 1 1 .164-.986c.77.127 1.452.328 1.957.594C12.5 13 13 13.4 13 14c0 .426-.26.752-.544.977-.29.228-.68.413-1.116.558-.878.293-2.059.465-3.34.465-1.281 0-2.462-.172-3.34-.465-.436-.145-.826-.33-1.116-.558C3.26 14.752 3 14.426 3 14c0-.599.5-1 .961-1.243.505-.266 1.187-.467 1.957-.594a.5.5 0 0 1 .575.411z"
         ></path>
       </symbol>
+      <symbol id="pie-chart" viewBox="0 0 16 16">
+        <path 
+          fill-rule="evenodd"
+          d="M7.5 1.018a7 7 0 0 0-4.79 11.566L7.5 7.793zm1 0V7.5h6.482A7 7 0 0 0 8.5 1.018M14.982 8.5H8.207l-4.79 4.79A7 7 0 0 0 14.982 8.5M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8"/>
+      </symbol>
+      <symbol id="line-chart" viewBox="0 0 16 16">
+        <path 
+          fill-rule="evenodd"
+          d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07"/>
+      </symbol>
+      <symbol id="logout" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+        <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+      </symbol>  
     </svg>
-    <nav class="navbar navbar-expand-lg navbar-light bg-marunggi">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-marunggi">
       <div class="container-fluid">
-        <img
-          src="{% static 'assets/images/admin.png' %}"
-          alt=""
-          width="54"
-          height="48"
-        />
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNavDropdown"
-          aria-controls="navbarNavDropdown"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-          <ul class="navbar-nav">
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdownMenuLink"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                {{username}}
-              </a>
-              <ul
-                class="dropdown-menu"
-                aria-labelledby="navbarDropdownMenuLink"
-              >
-                <li><a class="dropdown-item" href="/logout">Sign Out</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
+        <a class="navbar-brand fw-bold">
+          <img
+            src="{% static 'assets/images/marunggilogo (2).png' %}"
+            alt=""
+            width="46"
+            height="40"
+          />
+          UPTD PUSKESMAS MARUNGGI
+        </a>
+        <span class="navbar-text text-light-blue fw-normal">
+          Clustering dan Prediksi Data Penyakit
+        </span>
       </div>
     </nav>
     <main>
       <div class="container-fluid d-flex">
         <div class="bg-light height-auto">
-          <ul class="nav flex-column p-3">
+          <ul class="nav flex-column fixed-sidebar p-3">
+            <li class="nav-item">
+              <a href="#" class="d-flex align-items-center text-decoration-none nav-link disabled">
+                <img src="{% static 'assets/images/admin.png' %}" alt="" width="32" height="32" class="rounded-circle me-2">
+                <strong>{{session}}</strong>
+              </a>
+            </liv>
+            <li><hr class="dropdown-divider"></li>
             <li class="nav-item">
               <a href="/" class="nav-link link-black" aria-current="page">
                 <svg class="bi me-2" width="16" height="16">
@@ -186,50 +180,42 @@
             </li>
             <li class="nav-item">
               <a href="/kelola-user/0" class="nav-link link-black">
-                <img
-                  class="me-2"
-                  width="16"
-                  height="16"
-                  src="https://img.icons8.com/android/24/pie-chart.png"
-                  alt="pie-chart"
-                />
+                <svg class="bi me-2" width="16" height="16">
+                  <use xlink:href="#people-circle"></use>
+                </svg>
                 <span> Kelola User </span>
               </a>
             </li>
             <li class="nav-item">
               <a href="/kelola-data" class="nav-link link-black">
-                <img
-                  class="me-2"
-                  width="16"
-                  height="16"
-                  src="https://img.icons8.com/material-outlined/24/combo-chart.png"
-                  alt="combo-chart"
-                />
+                <svg class="bi me-2" width="16" height="16">
+                  <use xlink:href="#table"></use>
+                </svg>
                 <span> Kelola Data </span>
               </a>
             </li>
             <li class="nav-item">
               <a href="/hasil-cluster" class="nav-link link-black">
-                <img
-                  class="me-2"
-                  width="16"
-                  height="16"
-                  src="https://img.icons8.com/android/24/pie-chart.png"
-                  alt="pie-chart"
-                />
+                <svg class="bi me-2" width="16" height="16">
+                  <use xlink:href="#pie-chart"></use>
+                </svg>
                 <span> Hasil Cluster </span>
               </a>
             </li>
             <li class="nav-item">
               <a href="/hasil-prediksi" class="nav-link link-black">
-                <img
-                  class="me-2"
-                  width="16"
-                  height="16"
-                  src="https://img.icons8.com/material-outlined/24/combo-chart.png"
-                  alt="combo-chart"
-                />
+                <svg class="bi me-2" width="16" height="16">
+                  <use xlink:href="#line-chart"></use>
+                </svg>
                 <span> Hasil Prediksi </span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/logout" class="nav-link link-black">
+                <svg class="bi me-2" width="16" height="16">
+                  <use xlink:href="#logout"></use>
+                </svg>
+                <span> Logout </span>
               </a>
             </li>
           </ul>
@@ -246,9 +232,14 @@
       type="text/javascript"
     ></script>
   </body>
-  <footer class="footer mt-auto py-3 bg-dark text-center">
-    <div class="container-fluid">
-      <span class="text-muted">made by yashi</span>
+  <footer class="footer mt-auto py-3 bg-image" style="background-image: url('{% static 'assets/images/footer.jpg' %}');">
+    <div class="container-fluid ">
+      <div class="row">
+        <div class="col-lg-4 text-center">
+          <h5 class="text-dark text-center text-uppercase">Puskesmas Marunggi</h5><br>
+          <p class="text-dark">Website ini bertujuan untuk mengelompokkan penyakit dan memprediksi kasus penyakit berdasarkan data yang ada.</p>
+        </div>
+      </div>
     </div>
   </footer>
 </html>
